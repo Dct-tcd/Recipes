@@ -5,42 +5,49 @@ import Card from './Card';
 function Display() {
 const [randomdata, setrandomdata] = useState();
 
+const [query, setquery] = useState("banana");
+const [search, setsearch] = useState('')
+
 const apiGet = () => {
-    fetch(`https://api.edamam.com/api/recipes/v2?type=public&app_id=0efaa61a&app_key=425656359e4438fbb328ed558a95e18d&imageSize=REGULAR&random=true`)
+    fetch(`https://api.edamam.com/search?q=${query}&app_id=0efaa61a&app_key=425656359e4438fbb328ed558a95e18d&imageSize=REGULAR&random=true`)
       .then((res) => res.json())
       .then((res) => {
         console.log(res.hits);
         setrandomdata(res.hits);
    });
   };
+  const updateSearch = e => {
+    setsearch(e.target.value);
+  };
+
+  const getSearch = e => {
+    e.preventDefault();
+
+    setquery(search);
+    setsearch("");
+  }
 
   useEffect(() => {
    apiGet(); 
-  }, []);
+  }, [getSearch]);
   
     return (
-    <div>
-
-
+    <>
+    <div className='search-form' >
+      <input  className='search-bar' value={search}  onChange={updateSearch} type="text"  />
+      <button className='search-button' onClick={getSearch}>Search</button>
+    </div>
+    <div className='recipes'>
       { 
       randomdata!=null && randomdata.map((ele) => (
-            <div style={{borderRadius: "10px",
-            boxShadow: "0px 5px 20px rgb(63, 60, 60)",
-            margin: "10px",
-            display: "inline-block",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            // flexWrap: "wrap",
-            alignItems: "center",
-            minWidth: "40%",}}>
               
-   <Card key={ele.recipe.url} url = {ele.recipe.images.SMALL.url} name={ele.recipe.label} ing={ele.recipe.ingredientLines} />
+   <Card key={ele.recipe.url} url = {ele.recipe.image} name={ele.recipe.label} ing={ele.recipe.ingredientLines} />
 
-            </div>
-      ))
+            ))
       
       }
-    </div>
+      </div>
+    </>
   )
 }
 
